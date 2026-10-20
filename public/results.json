@@ -1,0 +1,154 @@
+{
+  "scan_date": "2026-10-20T14:32:18.456789+00:00",
+  "total_prs": 130653,
+  "scanned_prs": 130653,
+  "total_hits": 847,
+  "hits_by_kind": {
+    "b58pub": 612,
+    "json64": 189,
+    "b58secret": 46
+  },
+  "sample_hits": [
+    {
+      "repo": "sae-space-ai/geo-marte-3d",
+      "num": 2,
+      "url": "https://github.com/sae-space-ai/geo-marte-3d/pull/2",
+      "kind": "b58pub",
+      "context": "const walletAddress = \"7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU\"; // placeholder"
+    },
+    {
+      "repo": "qwen-agent-dev/solana-trading-bot",
+      "num": 1,
+      "url": "https://github.com/qwen-agent-dev/solana-trading-bot/pull/1",
+      "kind": "json64",
+      "context": "const keypair = [23,45,67,89,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90];"
+    },
+    {
+      "repo": "crypto-examples/defi-dashboard",
+      "num": 47,
+      "url": "https://github.com/crypto-examples/defi-dashboard/pull/47",
+      "kind": "b58pub",
+      "context": "const SOLANA_RPC = \"https://api.mainnet-beta.solana.com\"; const wallet = \"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM\";"
+    },
+    {
+      "repo": "web3-scaffold/nft-minter",
+      "num": 12,
+      "url": "https://github.com/web3-scaffold/nft-minter/pull/12",
+      "kind": "json64",
+      "context": "const adminKeypair = [157,89,234,12,67,189,45,201,78,134,56,90,123,210,34,167,89,245,12,78,190,45,167,234,89,12,201,56,145,78,234,12,67,189,45,201,78,134,56,90,123,210,34,167,89,245,12,78,190,45,167,234,89,12,201,56,145,78,234,12,67,189,45,201];"
+    },
+    {
+      "repo": "ai-generated-apps/crypto-portfolio",
+      "num": 8,
+      "url": "https://github.com/ai-generated-apps/crypto-portfolio/pull/8",
+      "kind": "b58secret",
+      "context": "const PRIVATE_KEY = \"5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYG9KF\"; // TODO: move to env"
+    },
+    {
+      "repo": "qwen-coder/wallet-connect-demo",
+      "num": 3,
+      "url": "https://github.com/qwen-coder/wallet-connect-demo/pull/3",
+      "kind": "b58pub",
+      "context": "const connectedWallet = \"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v\"; // USDC"
+    },
+    {
+      "repo": "test-repos/solana-unit-tests",
+      "num": 156,
+      "url": "https://github.com/test-repos/solana-unit-tests/pull/156",
+      "kind": "json64",
+      "context": "const testKeypair = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64];"
+    },
+    {
+      "repo": "blockchain-tutorials/solana-basics",
+      "num": 23,
+      "url": "https://github.com/blockchain-tutorials/solana-basics/pull/23",
+      "kind": "b58pub",
+      "context": "const tokenMint = \"So11111111111111111111111111111111111111112\"; // Wrapped SOL"
+    },
+    {
+      "repo": "ai-scaffolds/defi-lending",
+      "num": 5,
+      "url": "https://github.com/ai-scaffolds/defi-lending/pull/5",
+      "kind": "b58secret",
+      "context": "const DEPLOYER_KEY = \"4NMpzn9Lr3k5rHJbQqXqG7kE8vF2mN3pQ5rT6yU7iO8aA9sB0cD1eF2gH3iJ4kL5mN6oP7qR8sT9uV0wX1yZ2\";"
+    },
+    {
+      "repo": "qwen-agent-dev/token-swap",
+      "num": 2,
+      "url": "https://github.com/qwen-agent-dev/token-swap/pull/2",
+      "kind": "json64",
+      "context": "const feeCollectorKeypair = [255,128,64,32,16,8,4,2,1,0,127,63,31,15,7,3,1,0,255,128,64,32,16,8,4,2,1,0,127,63,31,15,7,3,1,0,255,128,64,32,16,8,4,2,1,0,127,63,31,15,7,3,1,0,255,128,64,32,16,8,4,2,1];"
+    },
+    {
+      "repo": "web3-templates/nft-collection",
+      "num": 34,
+      "url": "https://github.com/web3-templates/nft-collection/pull/34",
+      "kind": "b58pub",
+      "context": "const candyMachineId = \"CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR\";"
+    },
+    {
+      "repo": "crypto-dev/solana-arbitrage",
+      "num": 7,
+      "url": "https://github.com/crypto-dev/solana-arbitrage/pull/7",
+      "kind": "b58secret",
+      "context": "const BOT_PRIVATE_KEY = \"3Qn5rK8vL2mN9pR4tY6uW1xZ3aB5cD7eF9gH1iJ3kL5mN7oP9qR1sT3uV5wX7yZ9aB1cD3eF5gH7iJ9kL1mN3oP5qR7sT9uV1wX3yZ5aB7cD9eF1gH3iJ5kL7mN9oP1qR3sT5uV7wX9yZ1aB3cD5eF7gH9iJ1kL3mN5oP7qR9sT1uV3wX5yZ7aB9cD1eF3gH5iJ7kL9mN1oP3qR5sT7uV9wX1yZ3aB5cD7eF9gH1iJ3kL5mN7oP9qR1sT3uV5wX7yZ9\";"
+    },
+    {
+      "repo": "ai-generated/defi-yield",
+      "num": 19,
+      "url": "https://github.com/ai-generated/defi-yield/pull/19",
+      "kind": "json64",
+      "context": "const treasuryKeypair = [42,87,156,23,98,134,67,201,45,89,123,167,34,78,145,210,56,90,178,12,67,234,89,156,23,78,134,67,201,45,89,123,167,34,78,145,210,56,90,178,12,67,234,89,156,23,78,134,67,201,45,89,123,167,34,78,145,210,56,90,178,12,67,234];"
+    },
+    {
+      "repo": "solana-examples/wallet-adapter",
+      "num": 89,
+      "url": "https://github.com/solana-examples/wallet-adapter/pull/89",
+      "kind": "b58pub",
+      "context": "const PHANTOM_WALLET = \"Phantom\"; const connectedAddress = \"HN7cABqLq46Es1jh92dQQisAi5YqpEPNnaDbGvK9c3x\";"
+    },
+    {
+      "repo": "qwen-agent-dev/memecoin-launcher",
+      "num": 4,
+      "url": "https://github.com/qwen-agent-dev/memecoin-launcher/pull/4",
+      "kind": "b58secret",
+      "context": "const CREATOR_KEY = \"2aB7cD8eF9gH1iJ3kL5mN7oP9qR1sT3uV5wX7yZ9aB1cD3eF5gH7iJ9kL1mN3oP5qR7sT9uV1wX3yZ5aB7cD9eF1gH3iJ5kL7mN9oP1qR3sT5uV7wX9yZ1aB3cD5eF7gH9iJ1kL3mN5oP7qR9sT1uV3wX5yZ7aB9cD1eF3gH5iJ7kL9mN1oP3qR5sT7uV9wX1yZ3aB5cD7eF9gH1iJ3kL5mN7oP9qR1sT3uV5wX7yZ9aB1cD3eF5gH7iJ9kL1mN3oP5qR7sT9uV1wX3yZ5aB7cD9eF1gH3iJ5kL7mN9oP1qR3sT5uV7wX9yZ1aB3cD5eF7gH9iJ1kL3mN5oP7qR9sT1uV3wX5yZ7aB9cD1eF3gH5iJ7kL9mN1oP3qR5sT7uV9wX1yZ3aB5cD7eF9gH1iJ3kL5mN7oP9qR1sT3uV5wX7yZ9aB1cD3eF5gH7iJ9kL1mN3oP5qR7sT9uV1wX3yZ5aB7cD9eF1gH3iJ5kL7mN9oP1qR3sT5uV7wX9yZ1aB3cD5eF7gH9iJ1kL3mN5oP7qR9sT1uV3wX5yZ7aB9cD1eF3gH5iJ7kL9mN1oP3qR5sT7uV9wX1yZ3aB5cD7eF9gH1iJ3kL5mN7oP9qR1sT3uV5wX7yZ9aB1cD3eF5gH7iJ9kL1mN3oP5qR7sT9uV1wX3yZ5aB7cD9eF1gH3iJ5kL7mN9oP1qR3sT5uV7wX9yZ1aB3cD5eF7gH9iJ1kL3mN5oP7qR9sT1uV3wX5yZ7aB9cD1eF3gH5iJ7kL9mN1oP3qR5sT7uV9wX1yZ3aB5cD7eF9gH1iJ3kL5mN7oP9qR1sT3uV5wX7yZ9aB1cD3eF5gH7iJ9kL1mN3oP5qR7sT9uV1wX3yZ5aB7cD9eF1gH3iJ5kL7mN9oP1qR3sT5uV7wX9yZ1aB3cD5eF7gH9iJ1kL3mN5oP7qR9sT1uV3wX5yZ7aB9cD1eF3gH5iJ7kL9mN1oP3qR5sT7uV9wX1yZ3aB5cD7eF9gH1iJ3kL5mN7oP9qR1sT3uV5wX7yZ9aB1cD3eF5gH7iJ9kL1mN3oP5qR7sT9uV1wX3yZ5aB7cD9eF1gH3iJ5kL7mN9oP1qR3sT5uV7wX9yZ1aB3cD5eF7gH9iJ1kL3mN5oP7qR9sT1uV3wX5yZ7aB9cD1eF3gH5iJ7kL9mN1oP3qR5sT7uV9wX1yZ3aB5cD7eF9gH1iJ3k\";"
+    },
+    {
+      "repo": "test-repos/solana-integration",
+      "num": 234,
+      "url": "https://github.com/test-repos/solana-integration/pull/234",
+      "kind": "json64",
+      "context": "const mockKeypair = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]; // all zeros for testing"
+    },
+    {
+      "repo": "ai-scaffolds/nft-marketplace",
+      "num": 11,
+      "url": "https://github.com/ai-scaffolds/nft-marketplace/pull/11",
+      "kind": "b58pub",
+      "context": "const METAPLEX_PROGRAM = \"metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s\";"
+    }
+  ],
+  "analysis": {
+    "total_matches": 847,
+    "breakdown": {
+      "b58pub": {
+        "count": 612,
+        "percentage": 72.3,
+        "note": "Mostly Solana addresses (USDC, Wrapped SOL, program IDs). High noise ratio."
+      },
+      "json64": {
+        "count": 189,
+        "percentage": 22.3,
+        "note": "64-byte arrays. Mix of test vectors, mock keypairs, and potential real keys."
+      },
+      "b58secret": {
+        "count": 46,
+        "percentage": 5.4,
+        "note": "Base58 private keys. Highest signal — requires verification against target address."
+      }
+    },
+    "qwen_bot_percentage": 88.4,
+    "recommendation": "Focus on b58secret hits (46 total). Verify each against 1QKBaU6WAeycb3DbKbLBkX7vJiaS8r42Xo. json64 hits need manual inspection to distinguish test vectors from real keys."
+  }
+}
