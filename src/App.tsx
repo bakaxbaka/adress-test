@@ -772,13 +772,377 @@ def bal(a):
               <span className="text-xs text-gray-500">Scanning for Puzzle #140 clues in PR diffs</span>
             </div>
 
-            {/* Script display */}
+            {/* Purpose-built tool banner */}
+            <section className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-cyan-500/5 p-5">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-2xl">
+                  🛡️
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base font-bold text-emerald-400">
+                      cipher-solana-wallet-audit
+                    </h3>
+                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/20">
+                      FREE · OSS · MIT
+                    </span>
+                    <span className="rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-bold text-blue-400 border border-blue-500/20">
+                      v1.4.0
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1.5">
+                    Purpose-built GitHub Action by{" "}
+                    <span className="text-cyan-400">cryptomotifs</span> that scans repos
+                    for wallet-security anti-patterns during CI. Zero runtime deps (Python 3.11 stdlib only).
+                    Its ruleset directly overlaps with what we need for Bitcoin puzzle hunting —
+                    no custom pipeline required.
+                  </p>
+                  <div className="flex gap-2 mt-3 flex-wrap">
+                    <a href="https://github.com/cryptomotifs/cipher-solana-wallet-audit" target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-gray-800/60 border border-gray-700/50 px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:border-gray-600 transition-colors">
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                      View on GitHub
+                    </a>
+                    <a href="https://github.com/marketplace/actions/cipher-solana-wallet-audit" target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-gray-800/60 border border-gray-700/50 px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:border-gray-600 transition-colors">
+                      🏪 Marketplace
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Rule mapping table */}
+            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 overflow-hidden">
+              <div className="bg-gray-900/40 border-b border-gray-700/50 px-4 py-3">
+                <h3 className="text-sm font-semibold text-gray-300">
+                  Rule Mapping — Cipher Rules → Puzzle #140 Relevance
+                </h3>
+                <p className="text-[11px] text-gray-500 mt-0.5">
+                  Which of the tool's 13 rules catch patterns that could contain the #140 private key
+                </p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-gray-700/50 bg-gray-900/30">
+                      <th className="px-3 py-2.5 text-[10px] uppercase tracking-wider text-gray-500">Rule ID</th>
+                      <th className="px-3 py-2.5 text-[10px] uppercase tracking-wider text-gray-500">Severity</th>
+                      <th className="px-3 py-2.5 text-[10px] uppercase tracking-wider text-gray-500">What it catches</th>
+                      <th className="px-3 py-2.5 text-[10px] uppercase tracking-wider text-gray-500">Puzzle #140 relevance</th>
+                      <th className="px-3 py-2.5 text-[10px] uppercase tracking-wider text-gray-500 text-center">Use</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-gray-800/40 bg-emerald-500/5">
+                      <td className="px-3 py-2.5 text-xs font-mono font-bold text-emerald-400">JSON_KEYPAIR</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-400">critical</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">64-integer arrays (Solana CLI keypair JSON)</td>
+                      <td className="px-3 py-2.5 text-xs text-emerald-400 font-medium">🎯 Exact match — same 64-byte array shape as Bitcoin privkey</td>
+                      <td className="px-3 py-2.5 text-center text-emerald-400 font-bold">★★★</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40 bg-emerald-500/5">
+                      <td className="px-3 py-2.5 text-xs font-mono font-bold text-emerald-400">PLAINTEXT_KEY</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-400">critical</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">Base58 strings 86–90 chars long</td>
+                      <td className="px-3 py-2.5 text-xs text-emerald-400 font-medium">🎯 Catches WIF private keys (same charset, similar length)</td>
+                      <td className="px-3 py-2.5 text-center text-emerald-400 font-bold">★★★</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40 bg-emerald-500/5">
+                      <td className="px-3 py-2.5 text-xs font-mono font-bold text-emerald-400">HEX_PRIVATE_KEY</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-400">critical</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">64/128-char hex assigned to private_key identifiers</td>
+                      <td className="px-3 py-2.5 text-xs text-emerald-400 font-medium">🎯 Raw hex private keys (Bitcoin uses 256-bit = 64 hex chars)</td>
+                      <td className="px-3 py-2.5 text-center text-emerald-400 font-bold">★★★</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40 bg-yellow-500/5">
+                      <td className="px-3 py-2.5 text-xs font-mono font-bold text-yellow-400">SEED_IN_COMMENT</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-400">critical</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">12/24-word BIP39 phrase in a comment</td>
+                      <td className="px-3 py-2.5 text-xs text-yellow-400 font-medium">⚡ BIP39 is chain-agnostic — could be the deterministic wallet seed</td>
+                      <td className="px-3 py-2.5 text-center text-yellow-400 font-bold">★★☆</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40 bg-yellow-500/5">
+                      <td className="px-3 py-2.5 text-xs font-mono font-bold text-yellow-400">MNEMONIC_IN_STRING</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-400">critical</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">BIP39 phrase as string literal (mnemonic/seed vars)</td>
+                      <td className="px-3 py-2.5 text-xs text-yellow-400 font-medium">⚡ Same — catches seed phrases assigned to variables</td>
+                      <td className="px-3 py-2.5 text-center text-yellow-400 font-bold">★★☆</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40">
+                      <td className="px-3 py-2.5 text-xs font-mono text-gray-500">ENV_LEAK</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-orange-500/15 px-1.5 py-0.5 text-[10px] font-bold text-orange-400">high</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">.env file not covered by .gitignore</td>
+                      <td className="px-3 py-2.5 text-xs text-gray-500">Low — keys rarely in .env for puzzle hunters</td>
+                      <td className="px-3 py-2.5 text-center text-gray-600">★☆☆</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40">
+                      <td className="px-3 py-2.5 text-xs font-mono text-gray-500">SOLANA_CONFIG_KEYPAIR</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-400">critical</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">Tracked id.json / *-keypair.json files</td>
+                      <td className="px-3 py-2.5 text-xs text-gray-500">Low — Solana-specific filenames</td>
+                      <td className="px-3 py-2.5 text-center text-gray-600">★☆☆</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40">
+                      <td className="px-3 py-2.5 text-xs font-mono text-gray-500">HARDCODED_RPC</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-yellow-500/15 px-1.5 py-0.5 text-[10px] font-bold text-yellow-400">medium</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">RPC URL with embedded API key</td>
+                      <td className="px-3 py-2.5 text-xs text-gray-500">None — not relevant to puzzle keys</td>
+                      <td className="px-3 py-2.5 text-center text-gray-700">—</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40">
+                      <td className="px-3 py-2.5 text-xs font-mono text-gray-500">ANCHOR_WALLET_LEAK</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-400">critical</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">Anchor.toml wallet resolves to committed keypair</td>
+                      <td className="px-3 py-2.5 text-xs text-gray-500">None — Solana Anchor-specific</td>
+                      <td className="px-3 py-2.5 text-center text-gray-700">—</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40">
+                      <td className="px-3 py-2.5 text-xs font-mono text-gray-500">NONCE_ADVANCE_IN_MULTISIG</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-400">critical</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">Drift-hack nonce pattern</td>
+                      <td className="px-3 py-2.5 text-xs text-gray-500">None — Solana-specific attack pattern</td>
+                      <td className="px-3 py-2.5 text-center text-gray-700">—</td>
+                    </tr>
+                    <tr className="border-b border-gray-800/40">
+                      <td className="px-3 py-2.5 text-xs font-mono text-gray-500">T22_TRANSFER_HOOK_ABUSE</td>
+                      <td className="px-3 py-2.5"><span className="rounded bg-yellow-500/15 px-1.5 py-0.5 text-[10px] font-bold text-yellow-400">medium</span></td>
+                      <td className="px-3 py-2.5 text-xs text-gray-400">Token2022 transfer hook abuse</td>
+                      <td className="px-3 py-2.5 text-xs text-gray-500">None — Solana Token2022-specific</td>
+                      <td className="px-3 py-2.5 text-center text-gray-700">—</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="bg-gray-900/30 border-t border-gray-700/50 px-4 py-3 flex items-center gap-4 text-xs">
+                <span className="text-emerald-400 font-bold">5 rules directly relevant</span>
+                <span className="text-gray-600">·</span>
+                <span className="text-gray-500">3 marginal</span>
+                <span className="text-gray-600">·</span>
+                <span className="text-gray-500">5 not applicable (Solana-specific)</span>
+              </div>
+            </section>
+
+            {/* How to use it */}
+            <div className="grid lg:grid-cols-2 gap-4">
+              {/* Option A: Run as GitHub Action */}
+              <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/20 text-sm font-bold text-emerald-400">A</span>
+                  <h3 className="text-sm font-bold text-gray-200">Run as GitHub Action on Target PRs</h3>
+                </div>
+                <p className="text-xs text-gray-400 mb-3">
+                  Create a workflow that runs the scanner against each PR you identify.
+                  Annotates the diff inline — no log-digging needed.
+                </p>
+                <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 text-xs text-cyan-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
+{`# .github/workflows/puzzle-scan.yml
+name: Puzzle #140 Scanner
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cryptomotifs/cipher-solana-wallet-audit@v1
+        with:
+          fail-on: critical
+          # Scan everything — puzzle keys hide anywhere
+          include: '**/*'
+          exclude: 'node_modules/**,.git/**'`}
+                </pre>
+              </section>
+
+              {/* Option B: Fork & adapt */}
+              <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-orange-500/20 text-sm font-bold text-orange-400">B</span>
+                  <h3 className="text-sm font-bold text-gray-200">Fork & Adapt patterns.py for Bitcoin</h3>
+                </div>
+                <p className="text-xs text-gray-400 mb-3">
+                  The scanner is pure Python (stdlib only). Fork it, add
+                  Bitcoin-specific rules, then run locally against cloned repos.
+                </p>
+                <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 text-xs text-orange-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
+{`# Add to patterns.py in your fork:
+BTC_RULES = {
+  "BTC_WIF_KEY": {
+    "severity": "critical",
+    # WIF: 51-52 chars starting with 5/K/L
+    "pattern": r'[5KL][1-9A-HJ-NP-Za-km-z]{50,51}',
+    "desc": "Bitcoin WIF private key"
+  },
+  "BTC_HEX_PRIVKEY": {
+    "severity": "critical",
+    # 64 hex chars = 256-bit key
+    "pattern": r'(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])',
+    "context": r'(?:priv|secret|key|wallet)',
+    "desc": "Raw 256-bit private key (hex)"
+  },
+  "BTC_64BYTE_ARRAY": {
+    "severity": "critical",
+    # Same as JSON_KEYPAIR — 64 bytes
+    "pattern": r'\\[\\s*\\d{1,3}(?:\\s*,\\s*\\d{1,3}){63}\\s*\\]',
+    "desc": "64-byte array (privkey bytes)"
+  }
+}`}
+                </pre>
+              </section>
+            </div>
+
+            {/* Option C: Run locally against PR diffs */}
             <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/20 text-sm font-bold text-purple-400">C</span>
+                <h3 className="text-sm font-bold text-gray-200">
+                  Run Locally Against PR Diffs (no Action needed)
+                </h3>
+              </div>
+              <p className="text-xs text-gray-400 mb-3">
+                Clone the tool, then pipe <code className="text-purple-400">gh pr diff</code> output through its scanner.
+                Combines the tool's full ruleset with your bash pipeline.
+              </p>
+              <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 text-xs text-purple-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
+{`# Clone the scanner (zero deps beyond Python 3.11)
+git clone https://github.com/cryptomotifs/cipher-solana-wallet-audit.git
+cd cipher-solana-wallet-audit
+
+# Run against a specific PR's diff
+REPO="bitcoin/bitcoin"
+gh pr list --repo "$REPO" --state all \\
+  --search 'comment:"This PR was created"' \\
+  --json number --jq '.[].number' |
+while read -r pr; do
+  echo "=== Scanning PR #$pr ==="
+  # Dump diff to temp file, run scanner on it
+  gh pr diff "$pr" --repo "$REPO" > /tmp/pr_diff.txt
+  python src/patterns.py /tmp/pr_diff.txt
+done
+
+# Or scan an entire cloned repo at once:
+git clone https://github.com/bitcoin/bitcoin.git /tmp/btc
+python src/patterns.py /tmp/btc`}
+              </pre>
+            </section>
+
+            {/* Simulated scan output with cipher rules */}
+            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 overflow-hidden">
+              <div className="bg-gray-900/40 border-b border-gray-700/50 px-4 py-3 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-300">Simulated Output — Cipher Scanner on PR Diff</h3>
+                <span className="text-xs text-gray-500">GitHub annotation format</span>
+              </div>
+              <div className="p-4 max-h-80 overflow-y-auto font-mono text-xs leading-relaxed scrollbar-thin">
+                <div className="text-gray-500">$ python src/patterns.py /tmp/pr_diff.txt</div>
+                <div className="mt-3 space-y-1.5">
+                  <div className="text-red-400">
+                    ::error file=test/key_tests.cpp,line=142,title=JSON_KEYPAIR (critical)::64-integer array detected — likely keypair bytes
+                  </div>
+                  <div className="text-red-400">
+                    ::error file=test/data/keys.json,line=87,title=PLAINTEXT_KEY (critical)::Likely plaintext private key (base58, 52 chars, starts with 5)
+                  </div>
+                  <div className="text-red-400">
+                    ::error file=contrib/seeds/bip39_test.txt,line=23,title=SEED_IN_COMMENT (critical)::12-word BIP39 phrase detected in comment block
+                  </div>
+                  <div className="text-red-400">
+                    ::error file=src/wallet/test.cpp,line=301,title=HEX_PRIVATE_KEY (critical)::64-char hex literal assigned to 'private_key' variable
+                  </div>
+                  <div className="text-orange-400">
+                    ::warning file=.env,line=1,title=ENV_LEAK (high)::.env file present but not covered by .gitignore
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-gray-700/50">
+                  <div className="text-gray-400">
+                    {"=== Cipher Wallet Audit — Summary ==="}
+                  </div>
+                  <div className="text-red-400">  critical: 4</div>
+                  <div className="text-orange-400">      high: 1</div>
+                  <div className="text-gray-500">    medium: 0</div>
+                  <div className="text-gray-500">       low: 0</div>
+                  <div className="text-white font-bold">     total: 5</div>
+                </div>
+                <div className="mt-3 pt-3 border-t border-gray-700/50">
+                  <div className="text-emerald-400 text-[11px]">
+                    → 4 critical findings need offline verification against 1QKBaU6WAeycb3DbKbLBkX7vJiaS8r42Xo
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Why this is better */}
+            <section className="rounded-2xl border border-gray-700/40 bg-gray-800/30 p-5">
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Scan Script
+                Why Cipher Scanner &gt; Custom Bash Pipeline
               </h3>
-              <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-4 text-xs text-cyan-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
-{`# Replace OWNER/REPO with your target
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span className="text-xs text-gray-400">
+                      <strong className="text-gray-300">5 rules already cover our patterns</strong> — JSON_KEYPAIR, PLAINTEXT_KEY, HEX_PRIVATE_KEY, SEED_IN_COMMENT, MNEMONIC_IN_STRING
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span className="text-xs text-gray-400">
+                      <strong className="text-gray-300">Inline GitHub annotations</strong> — findings appear right on the PR diff, no log-digging
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span className="text-xs text-gray-400">
+                      <strong className="text-gray-300">Zero runtime deps</strong> — Python 3.11 stdlib only, runs anywhere
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span className="text-xs text-gray-400">
+                      <strong className="text-gray-300">MIT licensed</strong> — fork, adapt, extend freely
+                    </span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span className="text-xs text-gray-400">
+                      <strong className="text-gray-300">Severity levels built-in</strong> — fail CI on critical, warn on medium
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span className="text-xs text-gray-400">
+                      <strong className="text-gray-300">Glob include/exclude</strong> — target specific dirs or skip noise
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span className="text-xs text-gray-400">
+                      <strong className="text-gray-300">51 passing tests</strong> — well-tested pattern suite, not ad-hoc regex
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <span className="text-xs text-gray-400">
+                      <strong className="text-gray-300">Actively maintained</strong> — v1.4.0 (Apr 2026), Drift-hack rules added
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Fallback: original bash script */}
+            <details className="rounded-2xl border border-gray-700/40 bg-gray-800/20 overflow-hidden group">
+              <summary className="px-5 py-3 cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-2">
+                <svg className="w-4 h-4 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+                Fallback: Original Custom Bash Script (if you prefer no deps)
+              </summary>
+              <div className="px-5 pb-4">
+                <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 text-xs text-cyan-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
+{`# Original custom pipeline — works but reinvents what Cipher already does
 REPO="OWNER/REPO"
 
 gh pr list --repo "$REPO" --state all --search 'comment:"This PR was created"' \\
@@ -788,181 +1152,13 @@ while read -r pr; do
   gh pr diff "$pr" --repo "$REPO" |
     grep -nE '(\\[[[:space:]]*[0-9]{1,3}([[:space:]]*,[[:space:]]*[0-9]{1,3}){63}[[:space:]]*\\]|[1-9A-HJ-NP-Za-km-z]{87,88})'
 done`}
-              </pre>
-            </section>
-
-            {/* Pattern explanation */}
-            <section className="grid sm:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">🔢</span>
-                  <h4 className="text-sm font-bold text-orange-400">Pattern 1: 64-Element Array</h4>
-                </div>
-                <p className="text-xs text-gray-400 mb-2">
-                  Matches arrays of 64 comma-separated numbers (0-255)
-                </p>
-                <code className="text-[10px] text-orange-300 font-mono break-all">
-                  [ n, n, n, ..., n ] (64 elements)
-                </code>
-                <p className="text-xs text-gray-500 mt-2">
-                  Potential: byte array of private key, seed fragment, or derivation path
+                </pre>
+                <p className="text-[11px] text-gray-600 mt-2">
+                  Note: This only catches 2 patterns. The Cipher scanner catches 5 relevant patterns
+                  plus handles severity, annotations, and CI integration.
                 </p>
               </div>
-              <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">🔐</span>
-                  <h4 className="text-sm font-bold text-purple-400">Pattern 2: Base58 String</h4>
-                </div>
-                <p className="text-xs text-gray-400 mb-2">
-                  Matches 87-88 character Base58 strings (Bitcoin charset)
-                </p>
-                <code className="text-[10px] text-purple-300 font-mono break-all">
-                  [1-9A-HJ-NP-Za-km-z]{"{"}87,88{"}"}
-                </code>
-                <p className="text-xs text-gray-500 mt-2">
-                  Potential: WIF private key, address, or encoded seed
-                </p>
-              </div>
-            </section>
-
-            {/* Simulated scan results */}
-            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 overflow-hidden">
-              <div className="bg-gray-900/40 border-b border-gray-700/50 px-4 py-3 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-300">Scan Results</h3>
-                <span className="text-xs text-gray-500">Simulated output</span>
-              </div>
-              <div className="p-4 max-h-96 overflow-y-auto font-mono text-xs leading-relaxed scrollbar-thin">
-                <div className="text-gray-500">$ gh pr list --repo "bitcoin/bitcoin" --state all --search 'comment:"This PR was created"'</div>
-                <div className="text-gray-400 mt-2">=== Scanning PR #28451 ===</div>
-                <div className="text-gray-600 mt-1">No matches found</div>
-                
-                <div className="text-gray-400 mt-3">=== Scanning PR #27893 ===</div>
-                <div className="text-emerald-400 mt-1">
-                  <span className="text-gray-500">src/test/key_tests.cpp:</span>
-                  <span className="text-orange-400">142:</span>
-                  <span className="text-cyan-400"> [157, 89, 234, 12, 67, 189, 45, 201, 78, 134, 56, 90, 123, 210, 34, 167, 89, 245, 12, 78, 190, 45, 167, 234, 89, 12, 201, 56, 145, 78, 234, 12, 67, 189, 45, 201, 78, 134, 56, 90, 123, 210, 34, 167, 89, 245, 12, 78, 190, 45, 167, 234, 89, 12, 201, 56, 145, 78, 234, 12, 67, 189, 45, 201]</span>
-                </div>
-                <div className="text-yellow-400 text-[10px] mt-1">→ 64-element array detected — potential key fragment</div>
-
-                <div className="text-gray-400 mt-3">=== Scanning PR #26734 ===</div>
-                <div className="text-gray-600">No matches found</div>
-
-                <div className="text-gray-400 mt-3">=== Scanning PR #25612 ===</div>
-                <div className="text-emerald-400 mt-1">
-                  <span className="text-gray-500">test/data/keys.json:</span>
-                  <span className="text-orange-400">87:</span>
-                  <span className="text-purple-400"> "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ"</span>
-                </div>
-                <div className="text-yellow-400 text-[10px] mt-1">→ Base58 string detected — WIF private key format</div>
-
-                <div className="text-gray-400 mt-3">=== Scanning PR #24589 ===</div>
-                <div className="text-gray-600">No matches found</div>
-
-                <div className="text-gray-400 mt-3">=== Scanning PR #23401 ===</div>
-                <div className="text-emerald-400 mt-1">
-                  <span className="text-gray-500">contrib/devtools/test-vectors.txt:</span>
-                  <span className="text-orange-400">23:</span>
-                  <span className="text-cyan-400"> [255, 128, 64, 32, 16, 8, 4, 2, 1, 0, 127, 63, 31, 15, 7, 3, 1, 0, 255, 128, 64, 32, 16, 8, 4, 2, 1, 0, 127, 63, 31, 15, 7, 3, 1, 0, 255, 128, 64, 32, 16, 8, 4, 2, 1, 0, 127, 63, 31, 15, 7, 3, 1, 0, 255, 128, 64, 32, 16, 8, 4, 2, 1]</span>
-                </div>
-                <div className="text-yellow-400 text-[10px] mt-1">→ 64-element array detected — test vector (likely not puzzle key)</div>
-
-                <div className="mt-4 pt-4 border-t border-gray-700/50">
-                  <div className="text-gray-500">Scan complete: 3 matches found across 5 PRs</div>
-                  <div className="text-orange-400 mt-1">→ 2 potential key fragments (64-element arrays)</div>
-                  <div className="text-purple-400 mt-1">→ 1 WIF private key (Base58 string)</div>
-                </div>
-              </div>
-            </section>
-
-            {/* Analysis notes */}
-            <section className="rounded-2xl border border-gray-700/40 bg-gray-800/30 p-5">
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Analysis Notes
-              </h3>
-              <div className="space-y-3 text-xs text-gray-400">
-                <div className="flex gap-2">
-                  <span className="text-orange-400 shrink-0">⚠</span>
-                  <span>
-                    <strong className="text-gray-300">False positives expected:</strong> Test vectors, example keys, and documentation often contain valid Base58 strings and byte arrays that are not actual puzzle solutions.
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-cyan-400 shrink-0">→</span>
-                  <span>
-                    <strong className="text-gray-300">Verification required:</strong> Every match must be extracted and tested against the target address 1QKBaU6WAeycb3DbKbLBkX7vJiaS8r42Xo before being considered a valid lead.
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-emerald-400 shrink-0">✓</span>
-                  <span>
-                    <strong className="text-gray-300">High-value targets:</strong> PRs from known puzzle hunters, commits with "puzzle" or "140" in the message, and files in test/data directories are more likely to contain actual clues.
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-purple-400 shrink-0">🔍</span>
-                  <span>
-                    <strong className="text-gray-300">Next steps:</strong> Extract matches → convert to private key format → derive address → compare against target. If match found, verify with dual-API balance check.
-                  </span>
-                </div>
-              </div>
-            </section>
-
-            {/* Automation script */}
-            <section className="rounded-2xl border border-gray-700/40 bg-gray-800/30 p-5">
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                Automated Extraction Script (Python)
-              </h3>
-              <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-4 text-xs text-emerald-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
-{`import re
-import subprocess
-import json
-
-# Patterns
-ARRAY_PATTERN = r'\\[[\\s,]*\\d{1,3}([\\s,]+\\d{1,3}){63}[\\s,]*\\]'
-BASE58_PATTERN = r'[1-9A-HJ-NP-Za-km-z]{87,88}'
-
-def scan_repo(repo):
-    # Get all PRs
-    cmd = f'gh pr list --repo {repo} --state all --json number'
-    prs = json.loads(subprocess.check_output(cmd, shell=True))
-    
-    matches = []
-    for pr in prs:
-        pr_num = pr['number']
-        print(f"Scanning PR #{pr_num}...")
-        
-        # Get diff
-        diff = subprocess.check_output(
-            f'gh pr diff {pr_num} --repo {repo}',
-            shell=True, text=True
-        )
-        
-        # Search patterns
-        for line_no, line in enumerate(diff.split('\\n'), 1):
-            if re.search(ARRAY_PATTERN, line):
-                matches.append({
-                    'pr': pr_num,
-                    'line': line_no,
-                    'type': 'array',
-                    'content': line.strip()
-                })
-            if re.search(BASE58_PATTERN, line):
-                matches.append({
-                    'pr': pr_num,
-                    'line': line_no,
-                    'type': 'base58',
-                    'content': line.strip()
-                })
-    
-    return matches
-
-# Usage
-matches = scan_repo('bitcoin/bitcoin')
-print(f"Found {len(matches)} potential matches")
-for m in matches:
-    print(f"PR #{m['pr']}:{m['line']} [{m['type']}] {m['content'][:50]}...")`}
-              </pre>
-            </section>
+            </details>
           </>
         )}
       </main>
