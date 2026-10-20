@@ -801,6 +801,87 @@ def bal(a):
               </div>
             </section>
 
+            {/* Live intel: composition breakdown */}
+            <section className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-cyan-500/5 p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">📊</span>
+                <h3 className="text-base font-bold text-emerald-400">
+                  Live Intel — Composition Breakdown (Oct 20, 2026)
+                </h3>
+              </div>
+              <p className="text-xs text-gray-400 mb-4">
+                Verified against the live GitHub API. Dropping <code className="text-cyan-400">in:comments</code> broadens the search
+                (title + body + comments) and flips the dominant source entirely.
+              </p>
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                <div className="rounded-xl bg-gray-900/60 border border-gray-700/50 p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Total PRs</p>
+                  <p className="text-2xl font-bold text-white">130,653</p>
+                  <p className="text-[10px] text-gray-500 mt-1">created:≥2026-09-20</p>
+                </div>
+                <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-blue-400 mb-1">Qwen Bot</p>
+                  <p className="text-2xl font-bold text-blue-400">115,441</p>
+                  <p className="text-[10px] text-gray-500 mt-1">88.4% — agent scaffolds</p>
+                </div>
+                <div className="rounded-xl bg-purple-500/10 border border-purple-500/20 p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-purple-400 mb-1">Auto-Update Bots</p>
+                  <p className="text-2xl font-bold text-purple-400">15,207</p>
+                  <p className="text-[10px] text-gray-500 mt-1">11.6% — lockfile sync</p>
+                </div>
+                <div className="rounded-xl bg-orange-500/10 border border-orange-500/20 p-3">
+                  <p className="text-[10px] uppercase tracking-wider text-orange-400 mb-1">Residue</p>
+                  <p className="text-2xl font-bold text-orange-400">5</p>
+                  <p className="text-[10px] text-gray-500 mt-1">0.004% — human/unknown</p>
+                </div>
+              </div>
+
+              {/* Horizontal bar chart */}
+              <div className="rounded-xl bg-gray-900/60 border border-gray-700/50 p-4">
+                <p className="text-xs text-gray-400 mb-3">Composition (stacked)</p>
+                <div className="h-8 rounded-lg overflow-hidden flex">
+                  <div className="bg-blue-500 flex items-center justify-center text-[10px] font-bold text-white" style={{width: "88.4%"}}>
+                    Qwen 88.4%
+                  </div>
+                  <div className="bg-purple-500 flex items-center justify-center text-[10px] font-bold text-white" style={{width: "11.6%"}}>
+                    Auto 11.6%
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center gap-4 text-[10px] text-gray-500">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-blue-500" />
+                    <span>qwen-chat coder (agent scaffolds — real code, may contain keys)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-purple-500" />
+                    <span>automated updates (manifests, lockfiles)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Residue query */}
+              <div className="mt-4 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20">
+                <p className="text-xs text-orange-400 font-semibold mb-2">
+                  🔍 Residue Query — The 5 Non-Bot PRs (scan these first)
+                </p>
+                <code className="text-[11px] text-cyan-400 font-mono break-all">
+                  is:pr "This PR was created" -"qwen-chat coder" -automatically created:≥2026-09-20
+                </code>
+                <p className="text-[10px] text-gray-500 mt-2">
+                  Only 5 PRs. Scan these by hand in seconds — they're the most likely to be genuine human/bot-unknown.
+                </p>
+              </div>
+
+              {/* Key insight */}
+              <div className="mt-4 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-xs text-gray-400">
+                <strong className="text-emerald-400">Key Insight:</strong> The qwen bot PRs are <strong className="text-gray-300">real agent-authored code changes</strong>, not lockfile bumps.
+                A coding agent scaffolding an app is exactly the kind of thing that commits a <code className="text-cyan-400">deploy.ts</code> with a keypair in it.
+                Scan everything, but expect hits to concentrate in the blue band (qwen scaffolds).
+              </div>
+            </section>
+
             {/* Two-stage pipeline */}
             <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
               <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
@@ -1124,41 +1205,225 @@ BTC_RULES = {
               </section>
             </div>
 
-            {/* Option C: Run locally against PR diffs */}
+            {/* Option C: Revised script with datetime bisection */}
             <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
               <div className="flex items-center gap-2 mb-3">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/20 text-sm font-bold text-purple-400">C</span>
                 <h3 className="text-sm font-bold text-gray-200">
-                  Run Locally Against Global PR Diffs (no Action needed)
+                  Revised Script — Datetime Bisection (130k PRs)
                 </h3>
               </div>
               <p className="text-xs text-gray-400 mb-3">
-                Clone the tool, then search <strong className="text-gray-300">all public PRs globally</strong>, fetch each diff, and pipe through the scanner.
-                Combines the tool's full ruleset with GitHub's global search.
+                At 130k PRs, date-granularity split gives ~5,500/day per leaf — still 5.5x over the cap.
+                Bisect on <strong className="text-gray-300">datetime</strong>, not date. <code className="text-cyan-400">created:</code> accepts full ISO-8601 timestamps.
               </p>
               <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 text-xs text-purple-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
-{`# Clone the scanner (zero deps beyond Python 3.11)
-git clone https://github.com/cryptomotifs/cipher-solana-wallet-audit.git
-cd cipher-solana-wallet-audit
+{`#!/usr/bin/env python3
+import os, re, json, time, sqlite3, sys
+from datetime import datetime, timezone, timedelta
+from urllib.request import Request, urlopen
+from urllib.parse import urlencode
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# GLOBAL SEARCH: Find all PRs across GitHub with the comment phrase
-gh search prs 'is:pr "This PR was created" in:comments' \\
-  --json repository,number --limit 1000 |
-jq -r '.[] | "\\(.repository.nameWithOwner) \\(.number)"' |
-while read -r repo pr; do
-  echo "=== Scanning $repo PR #$pr ==="
-  # Fetch diff and run scanner
-  gh pr diff "$pr" --repo "$repo" > /tmp/pr_diff.txt
-  python src/patterns.py /tmp/pr_diff.txt
-done
+TOKEN  = os.environ.get("GITHUB_TOKEN", "")
+PHRASE = 'is:pr "This PR was created"'          # no in:comments
+CAP    = 1000
+WORKERS = 24
+RATE_S = 2.1        # authenticated search = 30 req/min
 
-# Or scan an entire cloned repo at once:
-git clone https://github.com/solana-labs/solana.git /tmp/solana
-python src/patterns.py /tmp/solana`}
+START = datetime(2026, 9, 20, tzinfo=timezone.utc)
+END   = datetime(2026, 10, 20, 23, 59, 59, tzinfo=timezone.utc)
+
+HDRS = {"Accept": "application/vnd.github+json", "User-Agent": "pr-solana-scan"}
+if TOKEN:
+    HDRS["Authorization"] = f"Bearer {TOKEN}"
+
+def iso(dt): return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+db = sqlite3.connect("scan.db")
+db.executescript("""
+  CREATE TABLE IF NOT EXISTS prs(repo TEXT, num INT, url TEXT, scanned INT DEFAULT 0,
+                                 PRIMARY KEY(repo, num));
+  CREATE TABLE IF NOT EXISTS hits(repo TEXT, num INT, url TEXT, kind TEXT,
+                                  line TEXT, PRIMARY KEY(repo, num, kind, line));
+""")
+
+def _get(url):
+    for a in range(6):
+        try:
+            with urlopen(Request(url, headers=HDRS), timeout=30) as r:
+                return json.load(r)
+        except Exception:
+            if a == 5: raise
+            time.sleep(2 ** a)
+
+def search_count(q):
+    n = _get("https://api.github.com/search/issues?" + urlencode({"q": q, "per_page": 1}))["total_count"]
+    time.sleep(RATE_S)
+    return n
+
+def harvest(q):
+    page, got = 1, 0
+    while True:
+        d = _get("https://api.github.com/search/issues?" +
+                 urlencode({"q": q, "per_page": 100, "page": page}))
+        items = d.get("items", [])
+        if not items: break
+        db.executemany("INSERT OR IGNORE INTO prs(repo,num,url) VALUES(?,?,?)",
+            [(i["repository_url"].split("/repos/")[1], i["number"],
+              i["pull_request"]["diff_url"]) for i in items])
+        db.commit(); got += len(items)
+        if len(items) < 100: break
+        page += 1; time.sleep(RATE_S)
+    return got
+
+def enum(lo, hi, depth=0):
+    """Bisect a datetime window until each leaf fits under the 1000 cap."""
+    q = f"{PHRASE} created:{iso(lo)}..{iso(hi)}"
+    n = search_count(q)
+    if n == 0: return 0
+    if n <= CAP or (hi - lo) <= timedelta(seconds=2):
+        print(f"  leaf {iso(lo)}..{iso(hi)}  ({n})", flush=True)
+        return harvest(q)
+    mid = lo + (hi - lo) / 2
+    return enum(lo, mid, depth+1) + enum(mid + timedelta(seconds=1), hi, depth+1)
+
+# ---- patterns: byte-constrained array, lookarounded base58 ----
+B   = r"(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)"
+B58 = "[1-9A-HJ-NP-Za-km-z]"
+PATTERNS = [
+    ("json64",    re.compile(rf"\\[[ \\t]*{B}(?:[ \\t]*,[ \\t]*{B}){{63}}[ \\t]*\\]")),
+    ("b58secret", re.compile(rf"(?<!{B58}){B58}{{87,88}}(?!{B58})")),
+    ("b58pub",    re.compile(rf"(?<!{B58}){B58}{{43,44}}(?!{B58})")),
+]
+
+def scan_one(row):
+    repo, num, url = row
+    try:
+        with urlopen(Request(url, headers={"User-Agent": "pr-solana-scan"}), timeout=45) as r:
+            diff = r.read().decode("utf-8", "replace")
+    except Exception as e:
+        print(f"  ! {repo}#{num}: {e}", file=sys.stderr, flush=True); return
+    for kind, pat in PATTERNS:
+        for m in pat.finditer(diff):
+            line = diff[max(0, m.start()-80): m.end()+40].replace("\\n", " ")
+            db.execute("INSERT OR IGNORE INTO hits VALUES(?,?,?,?,?)",
+                       (repo, num, f"https://github.com/{repo}/pull/{num}", kind, line[:300]))
+    db.execute("UPDATE prs SET scanned=1 WHERE repo=? AND num=?", (repo, num)); db.commit()
+
+if __name__ == "__main__":
+    todo = db.execute("SELECT repo,num,url FROM prs WHERE scanned=0").fetchall()
+    if not todo:
+        print(f"Enumerating {iso(START)} .. {iso(END)} ...")
+        print("total:", enum(START, END))
+        todo = db.execute("SELECT repo,num,url FROM prs WHERE scanned=0").fetchall()
+    print(f"Scanning {len(todo)} diffs ...")
+    with ThreadPoolExecutor(WORKERS) as ex:
+        for i, _ in enumerate(as_completed([ex.submit(scan_one, r) for r in todo]), 1):
+            if i % 2000 == 0: print(f"  {i}/{len(todo)}", flush=True)
+    print("\\n--- hits by kind ---")
+    for kind, c in db.execute("SELECT kind, COUNT(*) FROM hits GROUP BY kind ORDER BY 2 DESC"):
+        print(f"  {kind:10} {c}")`}
               </pre>
-              <div className="mt-3 p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20 text-xs text-yellow-400">
-                <strong>⚠ Rate Limits:</strong> GitHub API allows 5,000 requests/hour (authenticated).
-                Scanning 1,000 PRs = 1,000 diff fetches. Add delays or batch processing for large scans.
+            </section>
+
+            {/* Cost estimates */}
+            <section className="rounded-2xl border border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 to-orange-500/5 p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">⏱️</span>
+                <h3 className="text-base font-bold text-yellow-400">
+                  Cost & Time Estimates
+                </h3>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="rounded-xl bg-gray-900/60 border border-gray-700/50 p-4">
+                  <p className="text-xs text-gray-400 mb-2 font-semibold">Enumeration Phase</p>
+                  <ul className="text-xs text-gray-400 space-y-1.5">
+                    <li className="flex justify-between">
+                      <span>Count calls:</span>
+                      <span className="text-white font-mono">~260</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Result pages:</span>
+                      <span className="text-white font-mono">~1,310</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Total search requests:</span>
+                      <span className="text-white font-mono">~1,570</span>
+                    </li>
+                    <li className="flex justify-between border-t border-gray-700/50 pt-1.5 mt-1.5">
+                      <span className="font-semibold">Time (authenticated 30/min):</span>
+                      <span className="text-emerald-400 font-bold">~55 min</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Time (unauthenticated 10/min):</span>
+                      <span className="text-red-400 font-bold">~2.5 hours</span>
+                    </li>
+                  </ul>
+                  <p className="text-[10px] text-yellow-400 mt-2">⚠ Get a token. Unauthenticated is too slow.</p>
+                </div>
+                <div className="rounded-xl bg-gray-900/60 border border-gray-700/50 p-4">
+                  <p className="text-xs text-gray-400 mb-2 font-semibold">Diff Scan Phase</p>
+                  <ul className="text-xs text-gray-400 space-y-1.5">
+                    <li className="flex justify-between">
+                      <span>Total diffs to fetch:</span>
+                      <span className="text-white font-mono">130,000</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Workers:</span>
+                      <span className="text-white font-mono">24</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Avg time per fetch:</span>
+                      <span className="text-white font-mono">~0.4s</span>
+                    </li>
+                    <li className="flex justify-between border-t border-gray-700/50 pt-1.5 mt-1.5">
+                      <span className="font-semibold">Total time:</span>
+                      <span className="text-emerald-400 font-bold">1–2 hours</span>
+                    </li>
+                  </ul>
+                  <p className="text-[10px] text-gray-500 mt-2">
+                    Diff fetches use github.com/.../pull/N.diff — no API quota.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 p-3 rounded-lg bg-gray-900/60 border border-gray-700/50">
+                <p className="text-xs text-gray-400 mb-2 font-semibold">Bisection Details</p>
+                <ul className="text-xs text-gray-400 space-y-1">
+                  <li>• 130k → 1k needs <strong className="text-white">7 levels</strong> of bisection</li>
+                  <li>• Expect <strong className="text-white">~130 leaf windows</strong></li>
+                  <li>• <code className="text-cyan-400">timedelta(seconds=2)</code> floor guards against runaway split if one second exceeds cap</li>
+                  <li>• <code className="text-cyan-400">scan.db</code> resume behavior matters at this scale — scan will get interrupted</li>
+                </ul>
+              </div>
+            </section>
+
+            {/* Sanity check */}
+            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">🔬</span>
+                <h3 className="text-sm font-bold text-gray-200">
+                  Sanity Check — Signal Calibration
+                </h3>
+              </div>
+              <p className="text-xs text-gray-400 mb-3">
+                Pulled the top result's diff (<code className="text-cyan-400">sae-space-ai/geo-marte-3d#2</code>, a qwen agent scaffold — 717 modules, full TS app):
+              </p>
+              <div className="rounded-lg bg-gray-900/60 border border-gray-700/50 p-3 mb-3">
+                <p className="text-xs text-gray-400">
+                  <strong className="text-gray-300">Result:</strong> <span className="text-emerald-400 font-bold">Zero Solana matches</span>
+                </p>
+                <p className="text-[11px] text-gray-500 mt-1">
+                  It's a React/Three.js app with a sql.js backend, no wallet code. That's representative — a qwen agent builds whatever the task asked for,
+                  and most tasks aren't Solana.
+                </p>
+              </div>
+              <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20 text-xs text-gray-400">
+                <strong className="text-blue-400">Expectation:</strong> <code className="text-cyan-400">json64</code> hits will be genuinely rare.
+                <code className="text-cyan-400 ml-1">b58pub</code> hits will be dominated by noise.
+              </div>
+              <div className="mt-3 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20 text-xs text-orange-400">
+                <strong>💡 Recommendation:</strong> Before committing 2 hours, run enumeration only, then scan the first 2,000 diffs and extrapolate the <code>json64</code> rate.
               </div>
             </section>
 
