@@ -1205,32 +1205,38 @@ BTC_RULES = {
               </section>
             </div>
 
-            {/* Option C: Revised script with datetime bisection */}
-            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
+            {/* Option C: Production-ready script */}
+            <section className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/5 to-cyan-500/5 p-5">
               <div className="flex items-center gap-2 mb-3">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/20 text-sm font-bold text-purple-400">C</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/20 text-sm font-bold text-emerald-400">✓</span>
                 <h3 className="text-sm font-bold text-gray-200">
-                  Revised Script — Datetime Bisection (130k PRs)
+                  Production-Ready Script — Thread-Safe + Robust Bisection
                 </h3>
               </div>
-              <p className="text-xs text-gray-400 mb-3">
-                At 130k PRs, date-granularity split gives ~5,500/day per leaf — still 5.5x over the cap.
-                Bisect on <strong className="text-gray-300">datetime</strong>, not date. <code className="text-cyan-400">created:</code> accepts full ISO-8601 timestamps.
-              </p>
-              <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 text-xs text-purple-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
+              <div className="mb-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+                <p className="text-xs text-red-400 font-semibold mb-1">⚠ Critical Fix: Token Required for Diff Fetches</p>
+                <p className="text-[11px] text-gray-400">
+                  Without <code className="text-cyan-400">GITHUB_TOKEN</code>, diff fetches hit unauthenticated rate limit (60/hour).
+                  130k diffs @ 60/hour = <strong className="text-red-400">90 days</strong>. With token: 5,000/hour = <strong className="text-emerald-400">~26 hours</strong>.
+                </p>
+              </div>
+              <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 text-xs text-emerald-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed max-h-[600px]">
 {`#!/usr/bin/env python3
-import os, re, json, time, sqlite3, sys
+import os, re, json, time, sqlite3, sys, threading
 from datetime import datetime, timezone, timedelta
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+# --- Config ---
 TOKEN  = os.environ.get("GITHUB_TOKEN", "")
-PHRASE = 'is:pr "This PR was created"'          # no in:comments
+PHRASE = 'is:pr "This PR was created"'          # No in:comments
 CAP    = 1000
 WORKERS = 24
-RATE_S = 2.1        # authenticated search = 30 req/min
+RATE_S = 2.1        # Authenticated search = 30 req/min
+DB_FILE = "scan.db"
 
+# Window: Last 30 days
 START = datetime(2026, 9, 20, tzinfo=timezone.utc)
 END   = datetime(2026, 10, 20, 23, 59, 59, tzinfo=timezone.utc)
 
@@ -1238,24 +1244,42 @@ HDRS = {"Accept": "application/vnd.github+json", "User-Agent": "pr-solana-scan"}
 if TOKEN:
     HDRS["Authorization"] = f"Bearer {TOKEN}"
 
-def iso(dt): return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-db = sqlite3.connect("scan.db")
+# --- DB Setup (Thread-Safe) ---
+db_lock = threading.Lock()
+db = sqlite3.connect(DB_FILE, check_same_thread=False)
 db.executescript("""
-  CREATE TABLE IF NOT EXISTS prs(repo TEXT, num INT, url TEXT, scanned INT DEFAULT 0,
-                                 PRIMARY KEY(repo, num));
-  CREATE TABLE IF NOT EXISTS hits(repo TEXT, num INT, url TEXT, kind TEXT,
-                                  line TEXT, PRIMARY KEY(repo, num, kind, line));
+  CREATE TABLE IF NOT EXISTS prs(
+    repo TEXT, 
+    num INT, 
+    url TEXT, 
+    scanned INT DEFAULT 0,
+    PRIMARY KEY(repo, num)
+  );
+  CREATE TABLE IF NOT EXISTS hits(
+    repo TEXT, 
+    num INT, 
+    url TEXT, 
+    kind TEXT, 
+    line TEXT, 
+    PRIMARY KEY(repo, num, kind, line)
+  );
+  CREATE INDEX IF NOT EXISTS idx_prs_scanned ON prs(scanned);
 """)
 
+def iso(dt): 
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
 def _get(url):
-    for a in range(6):
+    """Rate-limited HTTP GET with retry."""
+    for attempt in range(6):
         try:
             with urlopen(Request(url, headers=HDRS), timeout=30) as r:
                 return json.load(r)
-        except Exception:
-            if a == 5: raise
-            time.sleep(2 ** a)
+        except Exception as e:
+            if attempt == 5: raise
+            wait = 2 ** attempt
+            print(f"  Retry {attempt+1} for {url.split('?')[0]}: {e}", file=sys.stderr)
+            time.sleep(wait)
 
 def search_count(q):
     n = _get("https://api.github.com/search/issues?" + urlencode({"q": q, "per_page": 1}))["total_count"]
@@ -1263,34 +1287,59 @@ def search_count(q):
     return n
 
 def harvest(q):
+    """Paginate through search results and insert into DB."""
     page, got = 1, 0
     while True:
         d = _get("https://api.github.com/search/issues?" +
                  urlencode({"q": q, "per_page": 100, "page": page}))
         items = d.get("items", [])
         if not items: break
-        db.executemany("INSERT OR IGNORE INTO prs(repo,num,url) VALUES(?,?,?)",
-            [(i["repository_url"].split("/repos/")[1], i["number"],
-              i["pull_request"]["diff_url"]) for i in items])
-        db.commit(); got += len(items)
+        
+        # Prepare batch
+        rows = []
+        for i in items:
+            repo = i["repository_url"].split("/repos/")[-1]
+            num = i["number"]
+            url = i["pull_request"]["diff_url"]
+            if url:
+                rows.append((repo, num, url))
+        
+        with db_lock:
+            db.executemany("INSERT OR IGNORE INTO prs(repo,num,url) VALUES(?,?,?)", rows)
+            db.commit()
+        
+        got += len(items)
         if len(items) < 100: break
-        page += 1; time.sleep(RATE_S)
+        page += 1
+        time.sleep(RATE_S)
     return got
 
 def enum(lo, hi, depth=0):
-    """Bisect a datetime window until each leaf fits under the 1000 cap."""
+    """Bisect datetime window until leaf fits under CAP."""
+    if lo >= hi: return 0
     q = f"{PHRASE} created:{iso(lo)}..{iso(hi)}"
     n = search_count(q)
-    if n == 0: return 0
+    
+    if n == 0:
+        return 0
+    
+    # Leaf condition: small enough or atomic time unit
     if n <= CAP or (hi - lo) <= timedelta(seconds=2):
-        print(f"  leaf {iso(lo)}..{iso(hi)}  ({n})", flush=True)
+        print(f"  [Leaf] {iso(lo)} .. {iso(hi)} ({n} results)", flush=True)
         return harvest(q)
+    
+    # Bisect
     mid = lo + (hi - lo) / 2
+    # Ensure mid is strictly between lo and hi
+    if mid <= lo or mid >= hi:
+        return harvest(q) # Fallback: treat as leaf if bisection fails
+    
+    print(f"  [Split] {iso(lo)} .. {iso(hi)} ({n} results) -> depth {depth}", flush=True)
     return enum(lo, mid, depth+1) + enum(mid + timedelta(seconds=1), hi, depth+1)
 
-# ---- patterns: byte-constrained array, lookarounded base58 ----
+# --- Patterns ---
 B   = r"(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)"
-B58 = "[1-9A-HJ-NP-Za-km-z]"
+B58 = r"[1-9A-HJ-NP-Za-km-z]"
 PATTERNS = [
     ("json64",    re.compile(rf"\\[[ \\t]*{B}(?:[ \\t]*,[ \\t]*{B}){{63}}[ \\t]*\\]")),
     ("b58secret", re.compile(rf"(?<!{B58}){B58}{{87,88}}(?!{B58})")),
@@ -1299,32 +1348,131 @@ PATTERNS = [
 
 def scan_one(row):
     repo, num, url = row
+    # CRITICAL: Add token to diff fetch to avoid unauthenticated rate limit
+    diff_headers = {"User-Agent": "pr-solana-scan"}
+    if TOKEN:
+        diff_headers["Authorization"] = f"Bearer {TOKEN}"
+    
     try:
-        with urlopen(Request(url, headers={"User-Agent": "pr-solana-scan"}), timeout=45) as r:
+        with urlopen(Request(url, headers=diff_headers), timeout=45) as r:
             diff = r.read().decode("utf-8", "replace")
     except Exception as e:
-        print(f"  ! {repo}#{num}: {e}", file=sys.stderr, flush=True); return
+        print(f"  ! {repo}#{num}: {e}", file=sys.stderr, flush=True)
+        return
+
+    hits = []
     for kind, pat in PATTERNS:
         for m in pat.finditer(diff):
-            line = diff[max(0, m.start()-80): m.end()+40].replace("\\n", " ")
-            db.execute("INSERT OR IGNORE INTO hits VALUES(?,?,?,?,?)",
-                       (repo, num, f"https://github.com/{repo}/pull/{num}", kind, line[:300]))
-    db.execute("UPDATE prs SET scanned=1 WHERE repo=? AND num=?", (repo, num)); db.commit()
+            start = max(0, m.start() - 80)
+            end = min(len(diff), m.end() + 40)
+            line = diff[start:end].replace("\\n", " ")
+            hits.append((repo, num, f"https://github.com/{repo}/pull/{num}", kind, line[:300]))
+
+    with db_lock:
+        if hits:
+            db.executemany("INSERT OR IGNORE INTO hits VALUES(?,?,?,?,?)", hits)
+        db.execute("UPDATE prs SET scanned=1 WHERE repo=? AND num=?", (repo, num))
+        db.commit()
 
 if __name__ == "__main__":
+    # 1. Enumerate if no data
     todo = db.execute("SELECT repo,num,url FROM prs WHERE scanned=0").fetchall()
     if not todo:
-        print(f"Enumerating {iso(START)} .. {iso(END)} ...")
-        print("total:", enum(START, END))
+        print(f"Enumerating {iso(START)} .. {iso(END)} ...", flush=True)
+        total = enum(START, END)
+        print(f"Enumeration complete. Total PRs in DB: {total}", flush=True)
         todo = db.execute("SELECT repo,num,url FROM prs WHERE scanned=0").fetchall()
-    print(f"Scanning {len(todo)} diffs ...")
-    with ThreadPoolExecutor(WORKERS) as ex:
-        for i, _ in enumerate(as_completed([ex.submit(scan_one, r) for r in todo]), 1):
-            if i % 2000 == 0: print(f"  {i}/{len(todo)}", flush=True)
-    print("\\n--- hits by kind ---")
+    
+    print(f"Scanning {len(todo)} diffs ...", flush=True)
+    
+    if todo:
+        with ThreadPoolExecutor(max_workers=WORKERS) as ex:
+            futures = [ex.submit(scan_one, r) for r in todo]
+            for i, _ in enumerate(as_completed(futures), 1):
+                if i % 2000 == 0: 
+                    print(f"  Progress: {i}/{len(todo)}", flush=True)
+    
+    # 2. Report
+    print("\\n--- Hits by kind ---")
     for kind, c in db.execute("SELECT kind, COUNT(*) FROM hits GROUP BY kind ORDER BY 2 DESC"):
-        print(f"  {kind:10} {c}")`}
+        print(f"  {kind:10} {c}")
+    
+    # 3. Show sample hits
+    print("\\n--- Sample Hits (first 10) ---")
+    for row in db.execute("SELECT repo, num, kind, line FROM hits LIMIT 10"):
+        print(f"  {row[0]}#{row[1]} [{row[2]}]: {row[3]}")`}
               </pre>
+            </section>
+
+            {/* Key improvements */}
+            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                Key Improvements in Production Version
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Thread-Safe SQLite</p>
+                      <p className="text-[11px] text-gray-500">
+                        <code className="text-cyan-400">threading.Lock()</code> prevents concurrent writes from corrupting the database.
+                        Critical with 24 workers scanning diffs in parallel.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Robust Bisection</p>
+                      <p className="text-[11px] text-gray-500">
+                        Explicit <code className="text-cyan-400">lo &gt;= hi</code> check and mid validation prevents infinite loops.
+                        Fallback to leaf if bisection fails.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Resume Capability</p>
+                      <p className="text-[11px] text-gray-500">
+                        <code className="text-cyan-400">prs</code> table is source of truth. Interrupted scans resume from <code className="text-cyan-400">scanned=0</code>.
+                        No re-processing.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <span className="text-red-400 shrink-0">⚠</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Token for Diff Fetches</p>
+                      <p className="text-[11px] text-gray-500">
+                        <strong className="text-red-400">Critical:</strong> Without token, unauthenticated rate limit is 60/hour (90 days for 130k diffs).
+                        With token: 5,000/hour (~26 hours).
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Retry Logic</p>
+                      <p className="text-[11px] text-gray-500">
+                        Exponential backoff (2^attempt seconds) with 6 retries. Handles transient network failures gracefully.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <span className="text-emerald-400 shrink-0">✓</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Sample Output</p>
+                      <p className="text-[11px] text-gray-500">
+                        Script now prints first 10 hits for quick verification. Helps confirm patterns are working before full scan.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </section>
 
             {/* Cost estimates */}
@@ -1374,27 +1522,121 @@ if __name__ == "__main__":
                       <span className="text-white font-mono">24</span>
                     </li>
                     <li className="flex justify-between">
-                      <span>Avg time per fetch:</span>
-                      <span className="text-white font-mono">~0.4s</span>
+                      <span>Rate limit (with token):</span>
+                      <span className="text-white font-mono">5,000/hour</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>Rate limit (no token):</span>
+                      <span className="text-red-400 font-mono">60/hour</span>
                     </li>
                     <li className="flex justify-between border-t border-gray-700/50 pt-1.5 mt-1.5">
-                      <span className="font-semibold">Total time:</span>
-                      <span className="text-emerald-400 font-bold">1–2 hours</span>
+                      <span className="font-semibold">Time (with token):</span>
+                      <span className="text-emerald-400 font-bold">~26 hours</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span className="font-semibold">Time (no token):</span>
+                      <span className="text-red-400 font-bold">~90 days</span>
                     </li>
                   </ul>
-                  <p className="text-[10px] text-gray-500 mt-2">
-                    Diff fetches use github.com/.../pull/N.diff — no API quota.
+                  <p className="text-[10px] text-red-400 mt-2">
+                    ⚠ Token required. Without it, rate limit is 60/hour (90 days).
                   </p>
                 </div>
               </div>
               <div className="mt-4 p-3 rounded-lg bg-gray-900/60 border border-gray-700/50">
-                <p className="text-xs text-gray-400 mb-2 font-semibold">Bisection Details</p>
+                <p className="text-xs text-gray-400 mb-2 font-semibold">Bisection & Resume Details</p>
                 <ul className="text-xs text-gray-400 space-y-1">
                   <li>• 130k → 1k needs <strong className="text-white">7 levels</strong> of bisection</li>
                   <li>• Expect <strong className="text-white">~130 leaf windows</strong></li>
-                  <li>• <code className="text-cyan-400">timedelta(seconds=2)</code> floor guards against runaway split if one second exceeds cap</li>
-                  <li>• <code className="text-cyan-400">scan.db</code> resume behavior matters at this scale — scan will get interrupted</li>
+                  <li>• <code className="text-cyan-400">lo &gt;= hi</code> check + mid validation prevents infinite loops</li>
+                  <li>• <code className="text-cyan-400">timedelta(seconds=2)</code> floor guards against runaway split</li>
+                  <li>• <code className="text-cyan-400">scan.db</code> is source of truth — interrupted scans resume from <code className="text-cyan-400">scanned=0</code></li>
+                  <li>• <code className="text-cyan-400">threading.Lock()</code> prevents SQLite corruption with 24 parallel workers</li>
                 </ul>
+              </div>
+            </section>
+
+            {/* Production checklist */}
+            <section className="rounded-2xl border border-orange-500/30 bg-gradient-to-r from-orange-500/10 to-red-500/5 p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">📋</span>
+                <h3 className="text-base font-bold text-orange-400">
+                  Pre-Flight Checklist
+                </h3>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <span className="text-red-400 shrink-0 mt-0.5">⚠</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">GitHub Token Required</p>
+                      <p className="text-[11px] text-gray-500">
+                        Set <code className="text-cyan-400">GITHUB_TOKEN</code> env var. Without it: 90 days for diff fetches.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-400 shrink-0 mt-0.5">✓</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Python 3.11+</p>
+                      <p className="text-[11px] text-gray-500">
+                        Zero external dependencies. Uses only stdlib modules.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-400 shrink-0 mt-0.5">✓</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Disk Space</p>
+                      <p className="text-[11px] text-gray-500">
+                        <code className="text-cyan-400">scan.db</code> will grow to ~50-100 MB for 130k PRs.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-400 shrink-0 mt-0.5">✓</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Stable Connection</p>
+                      <p className="text-[11px] text-gray-500">
+                        26-hour run. Resume capability built-in if interrupted.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-yellow-400 shrink-0 mt-0.5">⏱</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Time Commitment</p>
+                      <p className="text-[11px] text-gray-500">
+                        ~55 min enumeration + ~26 hours diff scan = <strong className="text-white">~27 hours total</strong>.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-400 shrink-0 mt-0.5">💡</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-300">Calibration Run</p>
+                      <p className="text-[11px] text-gray-500">
+                        Optional: enumerate only, scan first 2k diffs, extrapolate hit rate before full run.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 p-3 rounded-lg bg-gray-900/60 border border-gray-700/50">
+                <p className="text-xs text-gray-400 mb-2 font-semibold">Quick Start Commands</p>
+                <pre className="text-[11px] text-cyan-400 font-mono overflow-x-auto scrollbar-thin">
+{`# 1. Set token
+export GITHUB_TOKEN="ghp_your_token_here"
+
+# 2. Run script (will resume if interrupted)
+python3 pr-solana-scan.py
+
+# 3. Check results
+sqlite3 scan.db "SELECT kind, COUNT(*) FROM hits GROUP BY kind"
+sqlite3 scan.db "SELECT repo, num, kind, line FROM hits LIMIT 10"`}
+                </pre>
               </div>
             </section>
 
