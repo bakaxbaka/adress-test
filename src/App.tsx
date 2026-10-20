@@ -363,7 +363,7 @@ function WatchlistMonitor() {
 
 /* ─── Main App ─── */
 export default function App() {
-  const [tab, setTab] = useState<"overview" | "hunt" | "sweep" | "leads" | "sources">("overview");
+  const [tab, setTab] = useState<"overview" | "hunt" | "sweep" | "leads" | "sources" | "scanner">("overview");
   const [selectedPhase, setSelectedPhase] = useState<Phase | null>(null);
   const [leads] = useState<Lead[]>([
     { id: "L-001", source: "Phase 0", identifier: puzzle140.address, type: "address", claim: "Target address confirmed", confidence: "high", verified: true, timestamp: "2026-01-15T00:00:00Z" },
@@ -425,6 +425,7 @@ export default function App() {
             <TabBtn active={tab === "sweep"} label="Sweep Phases" count={sweepPhases.length} onClick={() => setTab("sweep")} />
             <TabBtn active={tab === "leads"} label="Leads" count={leads.length} onClick={() => setTab("leads")} />
             <TabBtn active={tab === "sources"} label="Sources" count={huntSources.length} onClick={() => setTab("sources")} />
+            <TabBtn active={tab === "scanner"} label="GH Scanner" onClick={() => setTab("scanner")} />
           </div>
         </div>
       </header>
@@ -759,6 +760,208 @@ def bal(a):
                   </pre>
                 </div>
               </div>
+            </section>
+          </>
+        )}
+
+        {/* ═══ GITHUB SCANNER TAB ═══ */}
+        {tab === "scanner" && (
+          <>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold">GitHub PR Scanner</h2>
+              <span className="text-xs text-gray-500">Scanning for Puzzle #140 clues in PR diffs</span>
+            </div>
+
+            {/* Script display */}
+            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Scan Script
+              </h3>
+              <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-4 text-xs text-cyan-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
+{`# Replace OWNER/REPO with your target
+REPO="OWNER/REPO"
+
+gh pr list --repo "$REPO" --state all --search 'comment:"This PR was created"' \\
+  --json number --jq '.[].number' |
+while read -r pr; do
+  echo "=== Scanning PR #$pr ==="
+  gh pr diff "$pr" --repo "$REPO" |
+    grep -nE '(\\[[[:space:]]*[0-9]{1,3}([[:space:]]*,[[:space:]]*[0-9]{1,3}){63}[[:space:]]*\\]|[1-9A-HJ-NP-Za-km-z]{87,88})'
+done`}
+              </pre>
+            </section>
+
+            {/* Pattern explanation */}
+            <section className="grid sm:grid-cols-2 gap-4">
+              <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">🔢</span>
+                  <h4 className="text-sm font-bold text-orange-400">Pattern 1: 64-Element Array</h4>
+                </div>
+                <p className="text-xs text-gray-400 mb-2">
+                  Matches arrays of 64 comma-separated numbers (0-255)
+                </p>
+                <code className="text-[10px] text-orange-300 font-mono break-all">
+                  [ n, n, n, ..., n ] (64 elements)
+                </code>
+                <p className="text-xs text-gray-500 mt-2">
+                  Potential: byte array of private key, seed fragment, or derivation path
+                </p>
+              </div>
+              <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">🔐</span>
+                  <h4 className="text-sm font-bold text-purple-400">Pattern 2: Base58 String</h4>
+                </div>
+                <p className="text-xs text-gray-400 mb-2">
+                  Matches 87-88 character Base58 strings (Bitcoin charset)
+                </p>
+                <code className="text-[10px] text-purple-300 font-mono break-all">
+                  [1-9A-HJ-NP-Za-km-z]{"{"}87,88{"}"}
+                </code>
+                <p className="text-xs text-gray-500 mt-2">
+                  Potential: WIF private key, address, or encoded seed
+                </p>
+              </div>
+            </section>
+
+            {/* Simulated scan results */}
+            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 overflow-hidden">
+              <div className="bg-gray-900/40 border-b border-gray-700/50 px-4 py-3 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-300">Scan Results</h3>
+                <span className="text-xs text-gray-500">Simulated output</span>
+              </div>
+              <div className="p-4 max-h-96 overflow-y-auto font-mono text-xs leading-relaxed scrollbar-thin">
+                <div className="text-gray-500">$ gh pr list --repo "bitcoin/bitcoin" --state all --search 'comment:"This PR was created"'</div>
+                <div className="text-gray-400 mt-2">=== Scanning PR #28451 ===</div>
+                <div className="text-gray-600 mt-1">No matches found</div>
+                
+                <div className="text-gray-400 mt-3">=== Scanning PR #27893 ===</div>
+                <div className="text-emerald-400 mt-1">
+                  <span className="text-gray-500">src/test/key_tests.cpp:</span>
+                  <span className="text-orange-400">142:</span>
+                  <span className="text-cyan-400"> [157, 89, 234, 12, 67, 189, 45, 201, 78, 134, 56, 90, 123, 210, 34, 167, 89, 245, 12, 78, 190, 45, 167, 234, 89, 12, 201, 56, 145, 78, 234, 12, 67, 189, 45, 201, 78, 134, 56, 90, 123, 210, 34, 167, 89, 245, 12, 78, 190, 45, 167, 234, 89, 12, 201, 56, 145, 78, 234, 12, 67, 189, 45, 201]</span>
+                </div>
+                <div className="text-yellow-400 text-[10px] mt-1">→ 64-element array detected — potential key fragment</div>
+
+                <div className="text-gray-400 mt-3">=== Scanning PR #26734 ===</div>
+                <div className="text-gray-600">No matches found</div>
+
+                <div className="text-gray-400 mt-3">=== Scanning PR #25612 ===</div>
+                <div className="text-emerald-400 mt-1">
+                  <span className="text-gray-500">test/data/keys.json:</span>
+                  <span className="text-orange-400">87:</span>
+                  <span className="text-purple-400"> "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ"</span>
+                </div>
+                <div className="text-yellow-400 text-[10px] mt-1">→ Base58 string detected — WIF private key format</div>
+
+                <div className="text-gray-400 mt-3">=== Scanning PR #24589 ===</div>
+                <div className="text-gray-600">No matches found</div>
+
+                <div className="text-gray-400 mt-3">=== Scanning PR #23401 ===</div>
+                <div className="text-emerald-400 mt-1">
+                  <span className="text-gray-500">contrib/devtools/test-vectors.txt:</span>
+                  <span className="text-orange-400">23:</span>
+                  <span className="text-cyan-400"> [255, 128, 64, 32, 16, 8, 4, 2, 1, 0, 127, 63, 31, 15, 7, 3, 1, 0, 255, 128, 64, 32, 16, 8, 4, 2, 1, 0, 127, 63, 31, 15, 7, 3, 1, 0, 255, 128, 64, 32, 16, 8, 4, 2, 1, 0, 127, 63, 31, 15, 7, 3, 1, 0, 255, 128, 64, 32, 16, 8, 4, 2, 1]</span>
+                </div>
+                <div className="text-yellow-400 text-[10px] mt-1">→ 64-element array detected — test vector (likely not puzzle key)</div>
+
+                <div className="mt-4 pt-4 border-t border-gray-700/50">
+                  <div className="text-gray-500">Scan complete: 3 matches found across 5 PRs</div>
+                  <div className="text-orange-400 mt-1">→ 2 potential key fragments (64-element arrays)</div>
+                  <div className="text-purple-400 mt-1">→ 1 WIF private key (Base58 string)</div>
+                </div>
+              </div>
+            </section>
+
+            {/* Analysis notes */}
+            <section className="rounded-2xl border border-gray-700/40 bg-gray-800/30 p-5">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Analysis Notes
+              </h3>
+              <div className="space-y-3 text-xs text-gray-400">
+                <div className="flex gap-2">
+                  <span className="text-orange-400 shrink-0">⚠</span>
+                  <span>
+                    <strong className="text-gray-300">False positives expected:</strong> Test vectors, example keys, and documentation often contain valid Base58 strings and byte arrays that are not actual puzzle solutions.
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-cyan-400 shrink-0">→</span>
+                  <span>
+                    <strong className="text-gray-300">Verification required:</strong> Every match must be extracted and tested against the target address 1QKBaU6WAeycb3DbKbLBkX7vJiaS8r42Xo before being considered a valid lead.
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-emerald-400 shrink-0">✓</span>
+                  <span>
+                    <strong className="text-gray-300">High-value targets:</strong> PRs from known puzzle hunters, commits with "puzzle" or "140" in the message, and files in test/data directories are more likely to contain actual clues.
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-purple-400 shrink-0">🔍</span>
+                  <span>
+                    <strong className="text-gray-300">Next steps:</strong> Extract matches → convert to private key format → derive address → compare against target. If match found, verify with dual-API balance check.
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            {/* Automation script */}
+            <section className="rounded-2xl border border-gray-700/40 bg-gray-800/30 p-5">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                Automated Extraction Script (Python)
+              </h3>
+              <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-4 text-xs text-emerald-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
+{`import re
+import subprocess
+import json
+
+# Patterns
+ARRAY_PATTERN = r'\\[[\\s,]*\\d{1,3}([\\s,]+\\d{1,3}){63}[\\s,]*\\]'
+BASE58_PATTERN = r'[1-9A-HJ-NP-Za-km-z]{87,88}'
+
+def scan_repo(repo):
+    # Get all PRs
+    cmd = f'gh pr list --repo {repo} --state all --json number'
+    prs = json.loads(subprocess.check_output(cmd, shell=True))
+    
+    matches = []
+    for pr in prs:
+        pr_num = pr['number']
+        print(f"Scanning PR #{pr_num}...")
+        
+        # Get diff
+        diff = subprocess.check_output(
+            f'gh pr diff {pr_num} --repo {repo}',
+            shell=True, text=True
+        )
+        
+        # Search patterns
+        for line_no, line in enumerate(diff.split('\\n'), 1):
+            if re.search(ARRAY_PATTERN, line):
+                matches.append({
+                    'pr': pr_num,
+                    'line': line_no,
+                    'type': 'array',
+                    'content': line.strip()
+                })
+            if re.search(BASE58_PATTERN, line):
+                matches.append({
+                    'pr': pr_num,
+                    'line': line_no,
+                    'type': 'base58',
+                    'content': line.strip()
+                })
+    
+    return matches
+
+# Usage
+matches = scan_repo('bitcoin/bitcoin')
+print(f"Found {len(matches)} potential matches")
+for m in matches:
+    print(f"PR #{m['pr']}:{m['line']} [{m['type']}] {m['content'][:50]}...")`}
+              </pre>
             </section>
           </>
         )}
