@@ -768,9 +768,140 @@ def bal(a):
         {tab === "scanner" && (
           <>
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold">GitHub PR Scanner</h2>
-              <span className="text-xs text-gray-500">Scanning for Puzzle #140 clues in PR diffs</span>
+              <h2 className="text-lg font-bold">Global GitHub PR Scanner</h2>
+              <span className="text-xs text-gray-500">Scanning all public PRs for Puzzle #140 clues</span>
             </div>
+
+            {/* Global search query banner */}
+            <section className="rounded-2xl border border-orange-500/30 bg-gradient-to-r from-orange-500/10 to-red-500/5 p-5">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-2xl">
+                  🌐
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-orange-400 mb-2">
+                    Stage 1: Global PR Discovery
+                  </h3>
+                  <p className="text-xs text-gray-400 mb-3">
+                    Search <strong className="text-gray-300">all public GitHub PRs</strong> (not scoped to a single repo) for the comment phrase.
+                    GitHub's issue/PR search works globally across the entire platform.
+                  </p>
+                  <div className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 font-mono text-sm text-cyan-400">
+                    is:pr "This PR was created" in:comments
+                  </div>
+                  <div className="mt-3 flex items-center gap-2 text-xs text-yellow-400">
+                    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>
+                      <strong>Limitation:</strong> GitHub caps search results at 1,000 items. This finds PR metadata only — not the code diffs inside them.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Two-stage pipeline */}
+            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                Two-Stage Pipeline
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/20 text-sm font-bold text-cyan-400">1</span>
+                    <h4 className="text-sm font-bold text-cyan-400">Find PRs Globally</h4>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-2">
+                    Use GitHub's global search to find all PRs containing the comment phrase.
+                  </p>
+                  <ul className="text-xs text-gray-500 space-y-1">
+                    <li>• Query: <code className="text-cyan-400">is:pr "This PR was created" in:comments</code></li>
+                    <li>• Tools: GitHub UI, <code className="text-cyan-400">gh</code> CLI, or API</li>
+                    <li>• Output: List of repo + PR number pairs</li>
+                    <li>• Limit: 1,000 results max per query</li>
+                  </ul>
+                </div>
+                <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/20 text-sm font-bold text-purple-400">2</span>
+                    <h4 className="text-sm font-bold text-purple-400">Scan Each PR's Diff</h4>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-2">
+                    For each PR found, fetch its diff and scan for Solana key patterns.
+                  </p>
+                  <ul className="text-xs text-gray-500 space-y-1">
+                    <li>• Fetch diff: <code className="text-purple-400">gh pr diff $PR --repo $REPO</code></li>
+                    <li>• Scan with: <code className="text-purple-400">cipher-solana-wallet-audit</code></li>
+                    <li>• Or: Custom grep with regex patterns</li>
+                    <li>• Output: Annotated findings per PR</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="mt-4 p-3 rounded-lg bg-gray-900/40 border border-gray-700/50 text-xs text-gray-400">
+                <strong className="text-gray-300">Why two stages?</strong> GitHub's code search does not index PR diffs or comments.
+                You cannot combine <code className="text-cyan-400">is:pr</code> with Solana key patterns in a single query.
+                The global search finds candidates; the scanner inspects their actual code.
+              </div>
+            </section>
+
+            {/* Solana key patterns */}
+            <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 p-5">
+              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
+                Stage 2: Solana Key Patterns to Detect
+              </h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">🔢</span>
+                    <h4 className="text-sm font-bold text-orange-400">64-Byte Numeric Arrays</h4>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-2">
+                    Classic Solana keypair JSON format — 64 integers (0-255)
+                  </p>
+                  <code className="text-[10px] text-orange-300 font-mono break-all">
+                    {"["}\\s*[0-9]{"{1,3}"}(\\s*,\\s*[0-9]{"{1,3}"}){"{63}"}\\s*{"]"}
+                  </code>
+                  <p className="text-[10px] text-gray-500 mt-2">
+                    Example: [123, 45, 67, ..., 99] (64 elements)
+                  </p>
+                </div>
+                <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">🔐</span>
+                    <h4 className="text-sm font-bold text-purple-400">Base58 Private Keys</h4>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-2">
+                    64-byte keys encoded as 87-88 char Base58 strings
+                  </p>
+                  <code className="text-[10px] text-purple-300 font-mono break-all">
+                    [1-9A-HJ-NP-Za-km-z]{"{87,88}"}
+                  </code>
+                  <p className="text-[10px] text-gray-500 mt-2">
+                    Example: 5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYG9KF
+                  </p>
+                </div>
+                <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xl">📍</span>
+                    <h4 className="text-sm font-bold text-cyan-400">Hardcoded Base58 Strings</h4>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-2">
+                    32-44 char Base58 strings (addresses or public keys)
+                  </p>
+                  <code className="text-[10px] text-cyan-300 font-mono break-all">
+                    [1-9A-HJ-NP-Za-km-z]{"{32,44}"}
+                  </code>
+                  <p className="text-[10px] text-gray-500 mt-2">
+                    Worth reviewing — may be addresses or public keys
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 p-3 rounded-lg bg-red-500/5 border border-red-500/20 text-xs text-red-400">
+                <strong>⚠ Invalid Pattern:</strong> The "even-index filter" (checking byte offset parity) has been intentionally omitted.
+                Byte offset parity has no bearing on key validity — this was a false lead.
+              </div>
+            </section>
 
             {/* Purpose-built tool banner */}
             <section className="rounded-2xl border border-emerald-500/30 bg-gradient-to-r from-emerald-500/10 to-cyan-500/5 p-5">
@@ -998,34 +1129,37 @@ BTC_RULES = {
               <div className="flex items-center gap-2 mb-3">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/20 text-sm font-bold text-purple-400">C</span>
                 <h3 className="text-sm font-bold text-gray-200">
-                  Run Locally Against PR Diffs (no Action needed)
+                  Run Locally Against Global PR Diffs (no Action needed)
                 </h3>
               </div>
               <p className="text-xs text-gray-400 mb-3">
-                Clone the tool, then pipe <code className="text-purple-400">gh pr diff</code> output through its scanner.
-                Combines the tool's full ruleset with your bash pipeline.
+                Clone the tool, then search <strong className="text-gray-300">all public PRs globally</strong>, fetch each diff, and pipe through the scanner.
+                Combines the tool's full ruleset with GitHub's global search.
               </p>
               <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 text-xs text-purple-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
 {`# Clone the scanner (zero deps beyond Python 3.11)
 git clone https://github.com/cryptomotifs/cipher-solana-wallet-audit.git
 cd cipher-solana-wallet-audit
 
-# Run against a specific PR's diff
-REPO="bitcoin/bitcoin"
-gh pr list --repo "$REPO" --state all \\
-  --search 'comment:"This PR was created"' \\
-  --json number --jq '.[].number' |
-while read -r pr; do
-  echo "=== Scanning PR #$pr ==="
-  # Dump diff to temp file, run scanner on it
-  gh pr diff "$pr" --repo "$REPO" > /tmp/pr_diff.txt
+# GLOBAL SEARCH: Find all PRs across GitHub with the comment phrase
+gh search prs 'is:pr "This PR was created" in:comments' \\
+  --json repository,number --limit 1000 |
+jq -r '.[] | "\\(.repository.nameWithOwner) \\(.number)"' |
+while read -r repo pr; do
+  echo "=== Scanning $repo PR #$pr ==="
+  # Fetch diff and run scanner
+  gh pr diff "$pr" --repo "$repo" > /tmp/pr_diff.txt
   python src/patterns.py /tmp/pr_diff.txt
 done
 
 # Or scan an entire cloned repo at once:
-git clone https://github.com/bitcoin/bitcoin.git /tmp/btc
-python src/patterns.py /tmp/btc`}
+git clone https://github.com/solana-labs/solana.git /tmp/solana
+python src/patterns.py /tmp/solana`}
               </pre>
+              <div className="mt-3 p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20 text-xs text-yellow-400">
+                <strong>⚠ Rate Limits:</strong> GitHub API allows 5,000 requests/hour (authenticated).
+                Scanning 1,000 PRs = 1,000 diff fetches. Add delays or batch processing for large scans.
+              </div>
             </section>
 
             {/* Simulated scan output with cipher rules */}
@@ -1132,31 +1266,40 @@ python src/patterns.py /tmp/btc`}
               </div>
             </section>
 
-            {/* Fallback: original bash script */}
+            {/* Fallback: global bash script */}
             <details className="rounded-2xl border border-gray-700/40 bg-gray-800/20 overflow-hidden group">
               <summary className="px-5 py-3 cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-300 transition-colors flex items-center gap-2">
                 <svg className="w-4 h-4 transition-transform group-open:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
-                Fallback: Original Custom Bash Script (if you prefer no deps)
+                Fallback: Global Bash Script (no deps, searches all public PRs)
               </summary>
               <div className="px-5 pb-4">
                 <pre className="rounded-lg bg-gray-950 border border-gray-700/50 p-3 text-xs text-cyan-400 font-mono overflow-x-auto scrollbar-thin leading-relaxed">
-{`# Original custom pipeline — works but reinvents what Cipher already does
-REPO="OWNER/REPO"
+{`# Global pipeline — searches ALL public GitHub PRs
+# Stage 1: Find PRs globally with the comment phrase
+# Stage 2: Scan each PR's diff for Solana key patterns
 
-gh pr list --repo "$REPO" --state all --search 'comment:"This PR was created"' \\
-  --json number --jq '.[].number' |
-while read -r pr; do
-  echo "=== Scanning PR #$pr ==="
-  gh pr diff "$pr" --repo "$REPO" |
+# Using GitHub's global search (not scoped to a repo)
+gh search prs 'is:pr "This PR was created" in:comments' \\
+  --json repository,number --limit 1000 |
+jq -r '.[] | "\\(.repository.nameWithOwner) \\(.number)"' |
+while read -r repo pr; do
+  echo "=== Scanning $repo PR #$pr ==="
+  gh pr diff "$pr" --repo "$repo" |
     grep -nE '(\\[[[:space:]]*[0-9]{1,3}([[:space:]]*,[[:space:]]*[0-9]{1,3}){63}[[:space:]]*\\]|[1-9A-HJ-NP-Za-km-z]{87,88})'
 done`}
                 </pre>
-                <p className="text-[11px] text-gray-600 mt-2">
-                  Note: This only catches 2 patterns. The Cipher scanner catches 5 relevant patterns
-                  plus handles severity, annotations, and CI integration.
-                </p>
+                <div className="mt-3 space-y-2 text-[11px] text-gray-500">
+                  <p>
+                    <strong className="text-gray-400">Note:</strong> This only catches 2 patterns. The Cipher scanner catches 5 relevant patterns
+                    plus handles severity, annotations, and CI integration.
+                  </p>
+                  <p>
+                    <strong className="text-yellow-400">⚠ Limits:</strong> GitHub caps search at 1,000 results. Rate limits apply (5,000 requests/hour authenticated).
+                    A truly exhaustive scan of all public PRs may require pagination or multiple queries.
+                  </p>
+                </div>
               </div>
             </details>
           </>
