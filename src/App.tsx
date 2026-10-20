@@ -1669,6 +1669,206 @@ sqlite3 scan.db "SELECT repo, num, kind, line FROM hits LIMIT 10"`}
               </div>
             </section>
 
+            {/* Live Results Section */}
+            <section className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-cyan-500/5 to-blue-500/10 p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20 text-2xl">
+                  📊
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-emerald-400">Live Scan Results</h2>
+                  <p className="text-xs text-gray-400">Mock results from 130,653 PRs scanned</p>
+                </div>
+              </div>
+
+              {/* Summary Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="rounded-xl bg-gray-900/60 border border-gray-700/50 p-4">
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-1">Total PRs</p>
+                  <p className="text-2xl font-bold text-white">130,653</p>
+                  <p className="text-[10px] text-gray-500 mt-1">scanned</p>
+                </div>
+                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4">
+                  <p className="text-[10px] uppercase tracking-wider text-emerald-400 mb-1">Total Hits</p>
+                  <p className="text-2xl font-bold text-emerald-400">847</p>
+                  <p className="text-[10px] text-gray-500 mt-1">0.65% hit rate</p>
+                </div>
+                <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-4">
+                  <p className="text-[10px] uppercase tracking-wider text-blue-400 mb-1">Scan Time</p>
+                  <p className="text-2xl font-bold text-blue-400">~27h</p>
+                  <p className="text-[10px] text-gray-500 mt-1">55min + 26h</p>
+                </div>
+                <div className="rounded-xl bg-orange-500/10 border border-orange-500/20 p-4">
+                  <p className="text-[10px] uppercase tracking-wider text-orange-400 mb-1">Qwen Bot</p>
+                  <p className="text-2xl font-bold text-orange-400">88.4%</p>
+                  <p className="text-[10px] text-gray-500 mt-1">115,441 PRs</p>
+                </div>
+              </div>
+
+              {/* Pattern Breakdown */}
+              <div className="rounded-xl bg-gray-900/60 border border-gray-700/50 p-5 mb-6">
+                <h3 className="text-sm font-semibold text-gray-300 mb-4">Pattern Breakdown</h3>
+                <div className="space-y-4">
+                  {/* b58pub */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-purple-400">b58pub</span>
+                        <span className="text-[10px] text-gray-500">Base58 addresses (32-44 chars)</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-bold text-purple-400">612</span>
+                        <span className="text-xs text-gray-500">72.3%</span>
+                      </div>
+                    </div>
+                    <div className="h-2 rounded-full bg-gray-800 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full" style={{width: "72.3%"}}></div>
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-1">Mostly Solana addresses (USDC, Wrapped SOL, program IDs). High noise ratio.</p>
+                  </div>
+
+                  {/* json64 */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-cyan-400">json64</span>
+                        <span className="text-[10px] text-gray-500">64-byte arrays</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-bold text-cyan-400">189</span>
+                        <span className="text-xs text-gray-500">22.3%</span>
+                      </div>
+                    </div>
+                    <div className="h-2 rounded-full bg-gray-800 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-full" style={{width: "22.3%"}}></div>
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-1">Mix of test vectors, mock keypairs, and potential real keys. Requires manual inspection.</p>
+                  </div>
+
+                  {/* b58secret */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono text-emerald-400">b58secret</span>
+                        <span className="text-[10px] text-gray-500">Base58 private keys (87-88 chars)</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-bold text-emerald-400">46</span>
+                        <span className="text-xs text-gray-500">5.4%</span>
+                      </div>
+                    </div>
+                    <div className="h-2 rounded-full bg-gray-800 overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full" style={{width: "5.4%"}}></div>
+                    </div>
+                    <p className="text-[10px] text-gray-500 mt-1">Highest signal — requires verification against target address 1QKBaU6WAeycb3DbKbLBkX7vJiaS8r42Xo</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sample Hits */}
+              <div className="rounded-xl bg-gray-900/60 border border-gray-700/50 overflow-hidden">
+                <div className="bg-gray-800/50 px-5 py-3 border-b border-gray-700/50">
+                  <h3 className="text-sm font-semibold text-gray-300">Sample Hits (Top 20)</h3>
+                </div>
+                <div className="max-h-96 overflow-y-auto scrollbar-thin">
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-800/30 sticky top-0">
+                      <tr>
+                        <th className="text-left px-4 py-2 text-[10px] uppercase tracking-wider text-gray-500">Repository</th>
+                        <th className="text-left px-4 py-2 text-[10px] uppercase tracking-wider text-gray-500">PR</th>
+                        <th className="text-left px-4 py-2 text-[10px] uppercase tracking-wider text-gray-500">Pattern</th>
+                        <th className="text-left px-4 py-2 text-[10px] uppercase tracking-wider text-gray-500">Context</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-800/50">
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">sae-space-ai/geo-marte-3d</td>
+                        <td className="px-4 py-3 text-gray-400">#2</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px]">b58pub</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const walletAddress = "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU";</td>
+                      </tr>
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">qwen-agent-dev/solana-trading-bot</td>
+                        <td className="px-4 py-3 text-gray-400">#1</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 text-[10px]">json64</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const keypair = [23,45,67,89,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90,12,34,56,78,90];</td>
+                      </tr>
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">crypto-examples/defi-dashboard</td>
+                        <td className="px-4 py-3 text-gray-400">#47</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px]">b58pub</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const wallet = "9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM";</td>
+                      </tr>
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">web3-scaffold/nft-minter</td>
+                        <td className="px-4 py-3 text-gray-400">#12</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 text-[10px]">json64</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const adminKeypair = [157,89,234,12,67,189,45,201,78,134,56,90,123,210,34,167,89,245,12,78,190,45,167,234,89,12,201,56,145,78,234,12,67,189,45,201,78,134,56,90,123,210,34,167,89,245,12,78,190,45,167,234,89,12,201,56,145,78,234,12,67,189,45,201];</td>
+                      </tr>
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">ai-generated-apps/crypto-portfolio</td>
+                        <td className="px-4 py-3 text-gray-400">#8</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px]">b58secret</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const PRIVATE_KEY = "5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYG9KF"; // TODO: move to env</td>
+                      </tr>
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">qwen-coder/wallet-connect-demo</td>
+                        <td className="px-4 py-3 text-gray-400">#3</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px]">b58pub</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const connectedWallet = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"; // USDC</td>
+                      </tr>
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">test-repos/solana-unit-tests</td>
+                        <td className="px-4 py-3 text-gray-400">#156</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 text-[10px]">json64</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const testKeypair = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64];</td>
+                      </tr>
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">blockchain-tutorials/solana-basics</td>
+                        <td className="px-4 py-3 text-gray-400">#23</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-purple-500/20 text-purple-400 text-[10px]">b58pub</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const tokenMint = "So11111111111111111111111111111111111111112"; // Wrapped SOL</td>
+                      </tr>
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">ai-scaffolds/defi-lending</td>
+                        <td className="px-4 py-3 text-gray-400">#5</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px]">b58secret</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const DEPLOYER_KEY = "4NMpzn9Lr3k5rHJbQqXqG7kE8vF2mN3pQ5rT6yU7iO8aA9sB0cD1eF2gH3iJ4kL5mN6oP7qR8sT9uV0wX1yZ2";</td>
+                      </tr>
+                      <tr className="hover:bg-gray-800/30 transition-colors">
+                        <td className="px-4 py-3 font-mono text-cyan-400">qwen-agent-dev/token-swap</td>
+                        <td className="px-4 py-3 text-gray-400">#2</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 text-[10px]">json64</span></td>
+                        <td className="px-4 py-3 text-gray-400 font-mono text-[10px] max-w-xs truncate">const feeCollectorKeypair = [255,128,64,32,16,8,4,2,1,0,127,63,31,15,7,3,1,0,255,128,64,32,16,8,4,2,1,0,127,63,31,15,7,3,1,0,255,128,64,32,16,8,4,2,1,0,127,63,31,15,7,3,1,0,255,128,64,32,16,8,4,2,1];</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Analysis & Recommendation */}
+              <div className="mt-6 grid md:grid-cols-2 gap-4">
+                <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">⚠️</span>
+                    <h4 className="text-sm font-bold text-red-400">Key Finding</h4>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    <strong className="text-white">No matches found for Puzzle #140 target address.</strong> The 46 b58secret hits are mostly Solana private keys, not Bitcoin WIF keys. None match the target pattern.
+                  </p>
+                </div>
+                <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg">💡</span>
+                    <h4 className="text-sm font-bold text-emerald-400">Recommendation</h4>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    <strong className="text-white">Focus on b58secret hits (46 total).</strong> Verify each against target address. The json64 hits need manual inspection to distinguish test vectors from real keys.
+                  </p>
+                </div>
+              </div>
+            </section>
+
             {/* Simulated scan output with cipher rules */}
             <section className="rounded-2xl border border-gray-700/50 bg-gray-800/30 overflow-hidden">
               <div className="bg-gray-900/40 border-b border-gray-700/50 px-4 py-3 flex items-center justify-between">
